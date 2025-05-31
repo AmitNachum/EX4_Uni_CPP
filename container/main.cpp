@@ -24,13 +24,6 @@ using namespace amit_container;
 
 
 
-
-
-
-
-#include <iostream>
-
-
 void print_title(const std::string& title, const std::string& color) {
     std::cout << color << "=== " << title << " ===" << RESET << '\n';
 }
@@ -41,13 +34,16 @@ void print_iterator(Iterator begin, Iterator end){
     for(auto i = begin ; i != end;){
         std::cout << *i;
         ++i;
-
         if(i!= end){
             std::cout << ", ";
         }
     }
     std::cout << "}\n\n";
 }
+
+
+using namespace amit_container;
+using namespace std;
 
 int main() {
     My_Container<int> container;
@@ -74,7 +70,17 @@ int main() {
     cout << "\n\n";
 
     print_title("Side Cross Iterator",MAGENTA);
-    print_iterator(container.begin_side_cross(),container.end_side_cross());
+    cout << "   {";
+    for(auto i = container.begin_side_cross();  i != container.end_side_cross() ; ++i){
+        cout<< *i;
+        if( i != container.end_side_cross()){
+            cout << ", ";
+        }
+    }
+    cout << *(container.end_side_cross());
+    
+    cout <<"}\n";
+    cout<<"\n\n";
     print_title("Side Cross End",MAGENTA);
     cout << "\n\n";
 

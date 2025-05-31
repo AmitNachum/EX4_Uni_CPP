@@ -123,7 +123,7 @@ namespace amit_container{
 
     Side_Cross_Order end_side_cross(){
        Side_Cross_Order iterator(container);
-       iterator.set_index(container.size());
+       iterator.set_index(container.size() / 2);
        return iterator;
     }
 
@@ -317,7 +317,7 @@ class Side_Cross_Order{
     Side_Cross_Order(const vector<T>& data)
         :sorted(data), right(sorted.size() - 1), left(0), from_left(true) {
             std::sort(sorted.begin(),sorted.end());
-            index = data.size;
+            index = left;
         }
 
     ~Side_Cross_Order() = default;
@@ -336,18 +336,20 @@ class Side_Cross_Order{
     }
 
     Side_Cross_Order& operator++() {
-        if (left > right) {
-            index = sorted.size();  // Mark as end
+        if ( left >= right ) {
+            index = left;
             return *this;
         }
-
-        if (from_left) {
-            index = left++;
-        } else {
-            index = right--;
+        if( left == 0 ){
+            left++;
         }
-
+        if(from_left){
+            index = right--;
+        } else{
+            index = left++;
+        }
         from_left = !from_left;
+
         return *this;
     }
 
