@@ -61,20 +61,40 @@ namespace amit_container{
 
         return os;
         }
-     
-    Middle_Out_Iterator begin_mid_out(){
-        int middle = (this->size() / 2);
-        Middle_Out_Iterator iter(container);
-        iter.set_index(middle);
-        return iter;
-    }    
-
-    Middle_Out_Iterator end_mid_out(){
-      int end = (this->size() % 2 != 0) ? this->size() : 0;
-      Middle_Out_Iterator iter(container);
-      iter.set_index(end);
-      return iter; 
+  Middle_Out_Iterator begin_mid_out() const {
+    Middle_Out_Iterator it(container);
+    size_t n = container.size();
+    if (n == 0) {
+        return it;
     }
+
+    size_t middle = n / 2;
+    it.set_index(middle);
+
+ 
+    if (middle == 0) {
+        it.set_left((size_t)-1);
+    } else {
+        it.set_left(middle - 1);
+    }
+
+    
+    it.set_right(middle + 1);
+
+    
+    it.set_went_left(false);
+
+    return it;
+}
+
+Middle_Out_Iterator end_mid_out() const {
+    Middle_Out_Iterator it(container);
+    it.set_index(container.size());
+    return it;
+}
+
+ 
+
 
 
     Order_Iterator begin_order(){
@@ -117,9 +137,10 @@ namespace amit_container{
     }
     
 
-    Side_Cross_Order begin_side_cross(){
-        return Side_Cross_Order(container);
-    }
+Side_Cross_Order begin_side_cross() {
+    Side_Cross_Order it(container);
+    return it;
+}
 
     Side_Cross_Order end_side_cross(){
        Side_Cross_Order iterator(container);
@@ -128,59 +149,102 @@ namespace amit_container{
     }
 
 
-class Middle_Out_Iterator{
-    
-    private:
+class Middle_Out_Iterator {
+private:
     vector<T> arrange;
     size_t index;
     size_t left;
     size_t right;
-    size_t middle;
-    bool went_left;
+    bool went_left;    
+    size_t sz;  
+    bool start;       
 
-    public:
+public:
+    
+    Middle_Out_Iterator(const vector<T>& data)
+        : arrange(data),
+          index(data.size()),    
+          left((size_t)-1),
+          right(data.size()),
+          went_left(false),
+          sz(data.size()),
+          start(true)
+    {}
 
-    Middle_Out_Iterator(const vector<T> data): arrange(data),index(0),went_left(false){
-        middle = arrange.size() / 2;
-        right = middle + 1;
-        left = middle - 1;
-    };
     Middle_Out_Iterator(const Middle_Out_Iterator& other) = default;
     ~Middle_Out_Iterator() = default;
     Middle_Out_Iterator& operator=(const Middle_Out_Iterator& other) = default;
 
-
-    T operator*(){
-        return arrange[index];
+    T operator*() const {
+        return arrange.at(index);
     }
 
- Middle_Out_Iterator& operator++() {
-    if (went_left && right < arrange.size()) {
-        index = right++;
-    } else if (!went_left && left < arrange.size()) {
-        index = left--;
-    } else {
-        index = arrange.size();  // terminate
+
+    Middle_Out_Iterator& operator++() {
+        if (index == sz) {
+            return *this;
+        }
+        if(start){
+            start = false;
+            went_left = true;
+            index = left;
+            left--;
+            return *this;
+        }
+
+        if (went_left) {
+            if (right < sz) {
+                index = right;
+                ++right;
+            } else {
+                index = sz;
+            }
+        } else {
+            if (left != (size_t)-1) {
+                index = left;
+                if (left > 0) {
+                    --left;
+                } else {
+                    left = (size_t)-1;
+                }
+            } else {
+                index = sz;  
+            }
+        }
+
+
+        went_left = !went_left;
+        return *this;
     }
-    went_left = !went_left;
-    return *this;
-}
 
 
-
-    bool operator!=(const Middle_Out_Iterator& other){
+    bool operator!=(const Middle_Out_Iterator& other) const {
         return this->index != other.index;
     }
 
-    void set_index(size_t changed){
-        if(changed > arrange.size()){
-            throw std::runtime_error("Index Out Of Bounce");
-        }
-        index = changed;
+    void set_index(size_t chagne){
+        index = chagne;
     }
 
+    void set_went_left(bool value){
+        went_left = value;
+    }
+    void set_right(size_t change){
+        if(change >= sz){
+            return;
+        }
+        right = change;
+    }
 
-};    
+    void set_left(size_t change){
+        if(change >= sz){
+            return;
+        }
+        left = change;
+    }
+    
+};
+  
 
 
 class Order_Iterator{
@@ -257,7 +321,9 @@ class Ascending_Iterator{
        return this->index != other.index;
     }
 
-
+    bool operator==(const Ascending_Iterator& other){
+        return this->index == other.index;
+    }
 
 
 };
@@ -297,7 +363,9 @@ class Descending_Iterator{
     bool operator!=(const Descending_Iterator& other){
         return this->index != other.index;
     }
-
+    bool operator==(const Descending_Iterator& other){
+        return this->index == other.index;
+    }
 
 
 
@@ -311,11 +379,12 @@ class Side_Cross_Order{
     size_t right;
     size_t left;
     bool from_left;
+    bool at_end;
 
     public:
 
     Side_Cross_Order(const vector<T>& data)
-        :sorted(data), right(sorted.size() - 1), left(0), from_left(true) {
+        :sorted(data), right(sorted.size() - 1), left(0), from_left(true),at_end(false) {
             std::sort(sorted.begin(),sorted.end());
             index = left;
         }
@@ -323,6 +392,34 @@ class Side_Cross_Order{
     ~Side_Cross_Order() = default;
     Side_Cross_Order(const Side_Cross_Order& other) = default;
     Side_Cross_Order& operator=(const Side_Cross_Order& other) = default;
+
+    bool get_end()const {
+        return at_end;
+    }
+    bool get_from_left()const {
+        return from_left;
+    }
+    size_t get_left()const{
+        return left;
+    }
+
+    size_t get_right()const{
+        return right;
+    }
+
+    void set_left(size_t change){
+        if(change >= sorted.size()){
+            return;
+        }
+        left = change;
+    }
+
+    void set_right(size_t change){
+        if(change >= sorted.size()){
+            return;
+        }
+        right = change;
+    } 
 
     T operator*()const{
         return sorted.at(index);
@@ -336,8 +433,8 @@ class Side_Cross_Order{
     }
 
     Side_Cross_Order& operator++() {
-        if ( left >= right ) {
-            index = left;
+        if ( left > right ) {
+            at_end = true;
             return *this;
         }
         if( left == 0 ){
@@ -350,13 +447,18 @@ class Side_Cross_Order{
         }
         from_left = !from_left;
 
+
         return *this;
     }
 
 
 
     bool operator!=(const Side_Cross_Order& other) const {
-        return this->index != other.index;
+        return !at_end || this->index != other.index ;
+    }
+
+      bool operator==(const Side_Cross_Order& other){
+        return this->index == other.index;
     }
 
 
@@ -394,6 +496,11 @@ class Reverse_Iterator {
         }
         index = changed;
     }
+
+    bool operator==(const Reverse_Iterator other){
+        return this->index == other.index;
+    }
+
     };
 };
 

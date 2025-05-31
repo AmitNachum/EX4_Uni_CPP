@@ -28,18 +28,21 @@ void print_title(const std::string& title, const std::string& color) {
     std::cout << color << "=== " << title << " ===" << RESET << '\n';
 }
 
-template<typename Iterator>
-void print_iterator(Iterator begin, Iterator end){
-    std::cout<< "\n   {";
-    for(auto i = begin ; i != end;){
-        std::cout << *i;
-        ++i;
-        if(i!= end){
-            std::cout << ", ";
+template <typename Iterator>
+void print_iterator(Iterator begin, Iterator end,size_t cont_size) {
+    std::cout << "\n   {";
+    size_t index_comma = 0;
+    for (auto it = begin; it != end; ++it) {
+        std::cout << *it;
+        if(index_comma < cont_size - 1){
+            index_comma++;
+            cout<< ", ";
         }
+
     }
     std::cout << "}\n\n";
 }
+
 
 
 using namespace amit_container;
@@ -50,57 +53,46 @@ int main() {
     container.add_element(7);
     container.add_element(15);
     container.add_element(6);
-    container.add_element(1);
+    //container.add_element(1);
     container.add_element(2);
 
     cout << "=== Original Container ===\n";
-    cout << "   Size of container: " << container.size() << "\n\n" << endl;
-    print_title("Container content",YELLOW);
-    cout << "\n";
+    cout << "   Size of container: " << container.size() << "\n" << endl;
     cout << "    " << container <<"\n\n";
 
     print_title("Ascending Iterator",BLUE);
-    print_iterator(container.begin_ascending(), container.end_ascending());
+    print_iterator(container.begin_ascending(), container.end_ascending(),container.size());
     print_title("End Ascending",BLUE);
     cout <<"\n\n";
 
     print_title("Descending Iterator",GREEN);
-    print_iterator(container.begin_descending(),container.end_descending());
+    print_iterator(container.begin_descending(),container.end_descending(),container.size());
     print_title("End Descending",GREEN);
     cout << "\n\n";
 
     print_title("Side Cross Iterator",MAGENTA);
-    cout << "   {";
-    for(auto i = container.begin_side_cross();  i != container.end_side_cross() ; ++i){
-        cout<< *i;
-        if( i != container.end_side_cross()){
-            cout << ", ";
-        }
-    }
-    cout << *(container.end_side_cross());
-    
-    cout <<"}\n";
-    cout<<"\n\n";
+    print_iterator(container.begin_side_cross(),container.end_side_cross(),container.size());
     print_title("Side Cross End",MAGENTA);
     cout << "\n\n";
 
     print_title("Reverse Iterator",RED);
-    print_iterator(container.begin_reverse(),container.end_reverse());
+    print_iterator(container.begin_reverse(),container.end_reverse(),container.size());
     print_title("Reverse End",RED);
     cout <<"\n\n";
 
 
     print_title("Order Iterator",DARK_BROWN);
-    print_iterator(container.begin_order(),container.end_order());
+    print_iterator(container.begin_order(),container.end_order(),container.size());
     print_title("End Order",DARK_BROWN);
     cout <<"\n\n";
 
-    
+    try{
     print_title("Middle Out Iterator",DARK_RED);
-    print_iterator(container.begin_mid_out(),container.end_mid_out());
+    print_iterator(container.begin_mid_out(),container.end_mid_out(),container.size());
     print_title("Middle Out end",DARK_RED);
-
-
+    } catch(std::exception& ex){
+        std::cout << (ex.what());
+    }
     
 
     return 0;

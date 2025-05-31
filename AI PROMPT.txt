@@ -1,0 +1,116 @@
+Me:
+
+hang on.
+
+would you mind to add some other obejcts like strings and perform the iterators?
+
+
+
+chatGPT:
+
+TEST_CASE("All Iterators with strings") {
+    My_Container<std::string> c;
+    c.add_element("delta");
+    c.add_element("bravo");
+    c.add_element("charlie");
+    c.add_element("alpha");
+
+    std::vector<std::string> expected_asc = {"alpha", "bravo", "charlie", "delta"};
+    std::vector<std::string> expected_desc = {"delta", "charlie", "bravo", "alpha"};
+    std::vector<std::string> expected_order = {"delta", "bravo", "charlie", "alpha"};
+    std::vector<std::string> expected_rev = {"alpha", "charlie", "bravo", "delta"};
+    std::vector<std::string> expected_side = {"alpha", "delta", "bravo", "charlie"};
+    std::vector<std::string> expected_mid = {"charlie", "bravo", "delta", "alpha"};
+
+    // Ascending
+    {
+        size_t i = 0;
+        for (auto it = c.begin_ascending(); it != c.end_ascending(); ++it, ++i) {
+            CHECK(*it == expected_asc[i]);
+        }
+        CHECK(i == expected_asc.size());
+    }
+
+    // Descending
+    {
+        size_t i = 0;
+        for (auto it = c.begin_descending(); it != c.end_descending(); ++it, ++i) {
+            CHECK(*it == expected_desc[i]);
+        }
+        CHECK(i == expected_desc.size());
+    }
+
+    // Order
+    {
+        size_t i = 0;
+        for (auto it = c.begin_order(); it != c.end_order(); ++it, ++i) {
+            CHECK(*it == expected_order[i]);
+        }
+        CHECK(i == expected_order.size());
+    }
+
+    // Reverse
+    {
+        size_t i = 0;
+        for (auto it = c.begin_reverse(); it != c.end_reverse(); ++it, ++i) {
+            CHECK(*it == expected_rev[i]);
+        }
+        CHECK(i == expected_rev.size());
+    }
+
+    // Side Cross
+    {
+        size_t i = 0;
+        for (auto it = c.begin_side_cross(); it != c.end_side_cross(); ++it, ++i) {
+            CHECK(*it == expected_side[i]);
+        }
+        CHECK(i == expected_side.size());
+    }
+
+    // Middle Out
+    {
+        size_t i = 0;
+        for (auto it = c.begin_mid_out(); it != c.end_mid_out(); ++it, ++i) {
+            CHECK(*it == expected_mid[i]);
+        }
+        CHECK(i == expected_mid.size());
+    }
+}
+
+
+Me:
+would you mind show me a general structure of an iterator please? 
+
+chatGPT:
+template<typename T>
+class MyIterator {
+private:
+    std::vector<T>* data;
+    std::size_t index;
+
+public:
+    // Constructor
+    MyIterator(std::vector<T>& vec, std::size_t idx = 0)
+        : data(&vec), index(idx) {}
+
+    // Dereference
+    T operator*() const {
+        return data->at(index);
+    }
+
+    // Pre-increment
+    MyIterator& operator++() {
+        ++index;
+        return *this;
+    }
+
+    // Inequality
+    bool operator!=(const MyIterator& other) const {
+        return index != other.index;
+    }
+
+    // Optional: Equality (if needed)
+    bool operator==(const MyIterator& other) const {
+        return index == other.index;
+    }
+};
